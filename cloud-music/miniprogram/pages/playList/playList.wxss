@@ -1,0 +1,7 @@
+.swiper-wrapper {
+  width: 100%;
+}
+.swipe-image {
+  width: 100%;
+  height: 400rpx;
+}
