@@ -24,9 +24,6 @@ Page({
         imageList: res.data
       })
     })
-    db.collection('playList').get().then((res) => {
-     console.log(res, 1111)
-    })
   },
   /**
    * 生命周期函数--监听页面初次渲染完成
@@ -35,7 +32,7 @@ Page({
     wx.cloud.callFunction({
       name: 'playList'
     }).then((res) => {
-      console.log(res)
+      console.log(res, 111)
     })
   },
 
