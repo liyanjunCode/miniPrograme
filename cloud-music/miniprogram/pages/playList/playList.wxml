@@ -1,8 +1,8 @@
 <view>
   <swiper class="swiper-wrapper" indicator-dots="true" autoplay="true">
     <block wx:for="{{imageList}}" wx:key="*this">
-    <swiper-item>
-        <image class="swipe-image" src="{{item.url}}" lazy-load="true"        mode="widthFix"></image>
+      <swiper-item>
+        <image class="swipe-image" src="{{item.url}}" lazy-load="true" mode="widthFix"></image>
       </swiper-item>
     </block>
   </swiper>

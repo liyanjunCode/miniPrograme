@@ -2,6 +2,7 @@
 const db = wx.cloud.database({
   env: "cloud-fun-1a4ff0"
 });
+const MAX_LIMIT = 15;
 Page({
 
   /**
@@ -9,7 +10,9 @@ Page({
    */
   data: {
     imageList: [],
-    playlist: []
+    playlist: [],
+    pageNum: 0,
+    loadStatus: false
   },
 
   /**
@@ -17,20 +20,33 @@ Page({
    */
   onLoad: function (options) {
     this._getSwiper();
-    this._getPlayList()
+    this._getPlayList();
   },
   _getSwiper() {
-    db.collection('swiper').get().then((res) => {
+    db.collection('swiper').get().then((res) => {  
       this.setData({
         imageList: res.data
       })
     })
   },
   _getPlayList() {
-    db.collection('playlist').get().then((res) => {
-      this.setData({
-        playlist: res.data
-      })
+    wx.showLoading({
+      title: '加载中',
+    })
+    wx.cloud.callFunction({
+      name: 'music',
+      data: {
+        $url: 'playlist',
+        start: this.data.playlist.length,
+        count: MAX_LIMIT
+      },
+      success: res => {
+        this.setData({
+          playlist: [...this.data.playlist,...res.result.data],
+          loadStatus: res.result.data.length ? false : true
+        })
+        wx.hideLoading();
+      }
     })
   },
   /**
@@ -39,28 +55,18 @@ Page({
   onReady: function () {
     
   },
-
-  /**
-   * 生命周期函数--监听页面显示
-   */
-  onShow: function () {
-
-  },
-
-  /**
-   * 生命周期函数--监听页面隐藏
-   */
-  onHide: function () {
-
-  },
-
-  /**
-   * 生命周期函数--监听页面卸载
-   */
-  onUnload: function () {
-
-  },
   onReachBottom(res) {
-    console.log(111)
+    if (this.data.loadStatus) { return}
+    this.setData({
+      loadStatus: true
+    })
+    this._getPlayList();
+  },
+  onPullDownRefresh (res) {
+    this.setData({
+      playlist: []
+    })
+    this._getSwiper();
+    this._getPlayList();
   }
 })
