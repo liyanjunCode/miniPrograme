@@ -47,6 +47,6 @@ Page({
     })
   },
   setMusicList() {
-    wx.setStorageSync('musiclist', this.data.musiclist)
+    wx.setStorageSync('musiclist', this.data.musicList)
   }
 })

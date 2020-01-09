@@ -1,66 +1,68 @@
 // miniprogram/pages/player/player.js
+const backgroundAudioManager = wx.getBackgroundAudioManager()
+let playIndex = 0
+let musiclist = []
+const app = getApp()
 Page({
 
   /**
    * 页面的初始数据
    */
   data: {
-
+    isSame: false
   },
 
   /**
    * 生命周期函数--监听页面加载
    */
   onLoad: function (options) {
-    console.log(options)
+    playIndex = options.index
+    musiclist = wx.getStorageSync('musiclist')
+    this.loadMusic(options.musicId)
   },
-
-  /**
-   * 生命周期函数--监听页面初次渲染完成
-   */
-  onReady: function () {
-
+  loadMusic(musicId) {
+    if (app.globalData.playingId === musicId) {
+      console.log(1111)
+    } else {
+      const musicItem = musiclist[playIndex]
+      this.getPlayMusic(musicId,musicItem)
+    }
   },
+  getPlayMusic(musicId, musicItem) {
+    wx.cloud.callFunction({
+      name: 'music',
+      data: {
+        $url: 'player',
+        musicId
+      },
+      success: (res) => {
+        const result = res.result.data[0]
+        if (result.url === null) {
+          wx.showToast({
+            title: '无权播放',
+          })
+          return
+        }
+        console.log(musicItem)
+        backgroundAudioManager.title = musicItem.name
+        backgroundAudioManager.epname = musicItem.name
+        backgroundAudioManager.singer = '许巍'
+        backgroundAudioManager.src = result.url
 
-  /**
-   * 生命周期函数--监听页面显示
-   */
-  onShow: function () {
-
+        this.getlyric(musicId)
+      }
+    })
   },
-
-  /**
-   * 生命周期函数--监听页面隐藏
-   */
-  onHide: function () {
-
-  },
-
-  /**
-   * 生命周期函数--监听页面卸载
-   */
-  onUnload: function () {
-
-  },
-
-  /**
-   * 页面相关事件处理函数--监听用户下拉动作
-   */
-  onPullDownRefresh: function () {
-
-  },
-
-  /**
-   * 页面上拉触底事件的处理函数
-   */
-  onReachBottom: function () {
-
-  },
-
-  /**
-   * 用户点击右上角分享
-   */
-  onShareAppMessage: function () {
-
+  getlyric(musicId) {
+    wx.cloud.callFunction({
+      name: 'music',
+      data: {
+        $url: 'lyric',
+        musicId
+      },
+      success: (res) => {
+        console.log(res, 333)
+      }
+    })
   }
 })
